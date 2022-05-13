@@ -65,6 +65,18 @@
         <resource-file src="src/android/res/drawable-mdpi/ic_action_remove.png" target="res/drawable-mdpi/ic_action_remove.png" />
         <resource-file src="src/android/res/drawable-xhdpi/ic_action_remove.png" target="res/drawable-xhdpi/ic_action_remove.png" />
         <resource-file src="src/android/res/drawable-xxhdpi/ic_action_remove.png" target="res/drawable-xxhdpi/ic_action_remove.png" />
+        <!--   anim     -->
+        <resource-file src="src/android/res/style/anim_style.xml" target="res/values/anim_style.xml" />
+        <resource-file src="src/android/res/style/dialog_bottom_in.xml" target="res/anim/dialog_bottom_in.xml" />
+        <resource-file src="src/android/res/style/dialog_bottom_out.xml" target="res/anim/dialog_bottom_out.xml" />
+        <resource-file src="src/android/res/style/dialog_center_in.xml" target="res/anim/dialog_center_in.xml" />
+        <resource-file src="src/android/res/style/dialog_center_out.xml" target="res/anim/dialog_center_out.xml" />
+        <resource-file src="src/android/res/style/dialog_left_in.xml" target="res/anim/dialog_left_in.xml" />
+        <resource-file src="src/android/res/style/dialog_left_out.xml" target="res/anim/dialog_left_out.xml" />
+        <resource-file src="src/android/res/style/dialog_right_in.xml" target="res/anim/dialog_right_in.xml" />
+        <resource-file src="src/android/res/style/dialog_right_out.xml" target="res/anim/dialog_right_out.xml" />
+        <resource-file src="src/android/res/style/dialog_top_in.xml" target="res/anim/dialog_top_in.xml" />
+        <resource-file src="src/android/res/style/dialog_top_out.xml" target="res/anim/dialog_top_out.xml" />
 
     </platform>
 

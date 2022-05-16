@@ -210,10 +210,10 @@ static CDVWKInAppBrowser* instance = nil;
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
-    if (browserOptions.closebuttoncaption != nil || browserOptions.closebuttoncolor != nil) {
-        int closeButtonIndex = browserOptions.lefttoright ? (browserOptions.hidenavigationbuttons ? 1 : 4) : 0;
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption :browserOptions.closebuttoncolor :closeButtonIndex];
-    }
+//    if (browserOptions.closebuttoncaption != nil || browserOptions.closebuttoncolor != nil) {
+//        int closeButtonIndex = browserOptions.lefttoright ? (browserOptions.hidenavigationbuttons ? 1 : 4) : 0;
+//        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption :browserOptions.closebuttoncolor :closeButtonIndex];
+//    }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
     if (browserOptions.presentationstyle != nil) {
@@ -315,6 +315,7 @@ static CDVWKInAppBrowser* instance = nil;
             if(!initHidden || osVersion < 11){
                 [self->tmpWindow makeKeyAndVisible];
             }
+
             [tmpController presentViewController:nav animated:!noAnimate completion:nil];
         }
     });
@@ -811,13 +812,24 @@ BOOL isExiting = FALSE;
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+//    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+//    self.closeButton.enabled = YES;
+    if(_browserOptions.closebuttoncaption==nil){
+        _browserOptions.closebuttoncaption =@"X";
+    }
+    NSString* closeString =_browserOptions.closebuttoncaption; // create arrow from Unicode char
+    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:closeString style:UIBarButtonItemStylePlain target:self action:@selector(close)];
     self.closeButton.enabled = YES;
+    self.closeButton.imageInsets = UIEdgeInsetsZero;
+    if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
+      self.closeButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
+    }
+
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
     UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-    fixedSpaceButton.width = 20;
+    fixedSpaceButton.width = 5;
 
     float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
     CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
@@ -881,13 +893,39 @@ BOOL isExiting = FALSE;
       self.forwardButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
-    NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
-    self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
+
+    NSString* backArrowString =@"<"; // create arrow from Unicode char
+    self.backArrowButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
+    self.backArrowButton.enabled = YES;
+    self.backArrowButton.width=5;
+    self.backArrowButton.imageInsets = UIEdgeInsetsZero;
+    if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
+      self.backArrowButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
+    }
+
+
+    NSString* backLabelString =@"< 返回"; // create arrow from Unicode char
+    self.backButton = [[UIBarButtonItem alloc] initWithTitle:backLabelString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
+    self.backButton.width=20;
     self.backButton.imageInsets = UIEdgeInsetsZero;
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
+
+    NSString* titleString =_browserOptions.title; // create arrow from Unicode char
+    if(titleString==nil){
+        titleString=@"";
+    }
+    self.titleButton = [[UIBarButtonItem alloc] initWithTitle:titleString style:UIBarButtonItemStylePlain target:self action:nil];
+    self.titleButton.enabled = YES;
+    self.titleButton.width=20;
+    self.titleButton.imageInsets = UIEdgeInsetsZero;
+    if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
+      self.titleButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
+    }
+
+
 
     // Filter out Navigation Buttons if user requests so
     if (_browserOptions.hidenavigationbuttons) {
@@ -899,13 +937,15 @@ BOOL isExiting = FALSE;
     } else if (_browserOptions.lefttoright) {
         [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
     } else {
-        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        [self.toolbar setItems:@[self.backButton, flexibleSpaceButton,self.titleButton,flexibleSpaceButton, self.closeButton]];
     }
+
 
     self.view.backgroundColor = [UIColor clearColor];
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
+
 }
 
 - (id)settingForKey:(NSString*)key
@@ -1110,7 +1150,11 @@ BOOL isExiting = FALSE;
 
 - (void)goBack:(id)sender
 {
-    [self.webView goBack];
+    if (self.webView.canGoBack){
+        [self.webView goBack];
+    }else{
+        [self close];
+    }
 }
 
 - (void)goForward:(id)sender
@@ -1173,8 +1217,8 @@ BOOL isExiting = FALSE;
     // loading url, start spinner, update back/forward
 
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    self.backButton.enabled = theWebView.canGoBack;
-    self.forwardButton.enabled = theWebView.canGoForward;
+//    self.backButton.enabled = theWebView.canGoBack;
+//    self.forwardButton.enabled = theWebView.canGoForward;
 
     NSLog(_browserOptions.hidespinner ? @"Yes" : @"No");
     if(!_browserOptions.hidespinner) {
@@ -1203,8 +1247,8 @@ BOOL isExiting = FALSE;
     // update url, stop spinner, update back/forward
 
     self.addressLabel.text = [self.currentURL absoluteString];
-    self.backButton.enabled = theWebView.canGoBack;
-    self.forwardButton.enabled = theWebView.canGoForward;
+//    self.backButton.enabled = theWebView.canGoBack;
+//    self.forwardButton.enabled = theWebView.canGoForward;
     theWebView.scrollView.contentInset = UIEdgeInsetsZero;
 
     [self.spinner stopAnimating];
@@ -1216,8 +1260,8 @@ BOOL isExiting = FALSE;
     // log fail message, stop spinner, update back/forward
     NSLog(@"webView:%@ - %ld: %@", delegateName, (long)error.code, [error localizedDescription]);
 
-    self.backButton.enabled = theWebView.canGoBack;
-    self.forwardButton.enabled = theWebView.canGoForward;
+//    self.backButton.enabled = theWebView.canGoBack;
+//    self.forwardButton.enabled = theWebView.canGoForward;
     [self.spinner stopAnimating];
 
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);

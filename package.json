@@ -19,7 +19,7 @@
     "browser",
     "inappbrowser",
     "ecosystem:cordova",
-    "cordova-android",
+    "cordova-android"
   ],
   "scripts": {
     "test": "npm run lint",

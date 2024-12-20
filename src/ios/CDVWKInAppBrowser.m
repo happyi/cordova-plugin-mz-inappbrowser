@@ -736,6 +736,7 @@ BOOL isExiting = FALSE;
     }
     configuration.applicationNameForUserAgent = userAgent;
     configuration.userContentController = userContentController;
+
 #if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
     configuration.processPool = [[CDVWebViewProcessPoolFactory sharedFactory] sharedProcessPool];
 #elif __has_include("CDVWKProcessPoolFactory.h")
@@ -894,17 +895,21 @@ BOOL isExiting = FALSE;
     }
 
 
-    NSString* backArrowString =@"<"; // create arrow from Unicode char
-    self.backArrowButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
+//    NSString* backArrowString =@"<"; // create arrow from Unicode char
+//    self.backArrowButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
+//    self.backArrowButton.enabled = YES;
+//    self.backArrowButton.width=5;
+//    self.backArrowButton.imageInsets = UIEdgeInsetsZero;
+//
+    UIImage *customArrowImage = [self drawLargeArrow];
+    self.backArrowButton = [[UIBarButtonItem alloc] initWithImage:customArrowImage style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backArrowButton.enabled = YES;
-    self.backArrowButton.width=5;
-    self.backArrowButton.imageInsets = UIEdgeInsetsZero;
+
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.backArrowButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
-
-    NSString* backLabelString =@"< 返回"; // create arrow from Unicode char
+    NSString* backLabelString =@"返回"; // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backLabelString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
     self.backButton.width=20;
@@ -937,7 +942,10 @@ BOOL isExiting = FALSE;
     } else if (_browserOptions.lefttoright) {
         [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
     } else {
-        [self.toolbar setItems:@[self.backButton, flexibleSpaceButton,self.titleButton,flexibleSpaceButton, self.closeButton]];
+        UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+        fixedSpace.width = -30;
+
+        [self.toolbar setItems:@[self.backArrowButton,fixedSpace,self.backButton, flexibleSpaceButton,self.titleButton,flexibleSpaceButton]];
     }
 
 
@@ -946,6 +954,33 @@ BOOL isExiting = FALSE;
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
 
+}
+
+- (UIImage *)drawLargeArrow {
+    CGSize size = CGSizeMake(24, 24); // Define the size of the image
+       UIGraphicsBeginImageContextWithOptions(size, NO, 0.0);
+       CGContextRef context = UIGraphicsGetCurrentContext();
+
+       // Set the stroke color and line width
+       CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
+       CGContextSetLineWidth(context, 2.0);
+
+       // Draw the arrow path
+       CGPoint startPoint = CGPointMake(4, 12); // Tip of the arrow
+       CGPoint leftPoint = CGPointMake(12, 4);  // Top of the triangle
+       CGPoint rightPoint = CGPointMake(12, 20); // Bottom of the triangle
+
+       CGContextMoveToPoint(context, startPoint.x, startPoint.y);
+       CGContextAddLineToPoint(context, leftPoint.x, leftPoint.y);
+       CGContextMoveToPoint(context, startPoint.x, startPoint.y);
+       CGContextAddLineToPoint(context, rightPoint.x, rightPoint.y);
+
+       CGContextStrokePath(context);
+
+       UIImage *arrowImage = UIGraphicsGetImageFromCurrentImageContext();
+       UIGraphicsEndImageContext();
+
+       return arrowImage;
 }
 
 - (id)settingForKey:(NSString*)key
@@ -1117,7 +1152,7 @@ BOOL isExiting = FALSE;
 }
 
 - (BOOL)prefersStatusBarHidden {
-    return NO;
+    return YES;
 }
 
 - (void)close

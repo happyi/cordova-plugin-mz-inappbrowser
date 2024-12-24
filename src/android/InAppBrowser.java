@@ -24,7 +24,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Message;
 import android.os.Parcelable;
 import android.provider.Browser;
 import android.content.res.Resources;
@@ -807,15 +806,16 @@ public class InAppBrowser extends CordovaPlugin {
                     window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
                 }
 
+
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 //注意要清除 FLAG_TRANSLUCENT_STATUS flag
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 window.setStatusBarColor(toolbarColor);
 
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//                if (fullscreen) {
-//                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//                }
+                if (fullscreen) {
+                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                }
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 
@@ -828,8 +828,14 @@ public class InAppBrowser extends CordovaPlugin {
                 //Please, no more black!
                 toolbar.setBackgroundColor(toolbarColor);
                 toolbar.setFitsSystemWindows(false);
-                toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(75)));
-                toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(25), this.dpToPixels(2), this.dpToPixels(2));
+                if(fullscreen){
+                    toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(50)));
+                    toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
+                }else{
+                    toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(75)));
+                    toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(25), this.dpToPixels(2), this.dpToPixels(2));
+                }
+
                 if (leftToRight) {
                     toolbar.setHorizontalGravity(Gravity.LEFT);
                 } else {
@@ -930,9 +936,9 @@ public class InAppBrowser extends CordovaPlugin {
                 titleView.setGravity(Gravity.CENTER);
 
                 // Header Close/Done button
-                int closeButtonId = leftToRight ? 1 : 5;
-                View close = createCloseButton(closeButtonId);
-                toolbar.addView(close);
+//                int closeButtonId = leftToRight ? 1 : 5;
+//                View close = createCloseButton(closeButtonId);
+//                toolbar.addView(close);
 
                 // Footer
                 RelativeLayout footer = new RelativeLayout(cordova.getActivity());
@@ -1017,7 +1023,11 @@ public class InAppBrowser extends CordovaPlugin {
                 if (appendUserAgent != null) {
                     settings.setUserAgentString(settings.getUserAgentString() + appendUserAgent);
                 }
+                String contentMode = preferences.getString("PreferredContentMode", "");
 
+                if("desktop".equals(contentMode)){
+                    settings.setUserAgentString("desktop");
+                }
                 //Toggle whether this is enabled or not!
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
                 boolean enableDatabase = appSettings == null ? true : appSettings.getBoolean("InAppBrowserStorageEnabled", true);
@@ -1058,10 +1068,10 @@ public class InAppBrowser extends CordovaPlugin {
                 if (!hideUrlBar) toolbar.addView(titleView);
 
                 // Don't add the toolbar if its been disabled
-                if (getShowLocationBar()) {
-                    // Add our toolbar to our main view/layout
-                    main.addView(toolbar);
-                }
+//                if (getShowLocationBar()) {
+                // Add our toolbar to our main view/layout
+                main.addView(toolbar);
+//                }
 
                 // Add our webview to our main view/layout
                 RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());

@@ -906,7 +906,7 @@ public class InAppBrowser extends CordovaPlugin {
                 TextView titleView = new TextView(cordova.getActivity());
                 titleView.setText(title);
                 titleView.setTextColor(android.graphics.Color.parseColor(closeButtonColor));
-                titleView.setTextSize(16);
+                titleView.setTextSize(18);
                 titleView.setLayoutParams(textLayoutParams);
                 titleView.setGravity(Gravity.CENTER);
 

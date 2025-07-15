@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-mz-inappbrowser",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
@@ -10,6 +10,7 @@
       "ios"
     ]
   },
+
   "repository": "github:apache/cordova-plugin-inappbrowser",
   "bugs": "https://github.com/apache/cordova-plugin-inappbrowser/issues",
   "keywords": [
@@ -22,8 +23,8 @@
     "cordova-android"
   ],
   "scripts": {
-    "test": "npm run lint",
-    "lint": "eslint ."
+    "push-public": "npm publish --registry=https://registry.npmjs.org/",
+    "push-private": "npm publish --registry=https://nexus.mezeron.cn/repository/npm-mezeron/"
   },
   "engines": {
     "cordovaDependencies": {

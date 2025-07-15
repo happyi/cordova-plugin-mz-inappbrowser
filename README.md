@@ -9,8 +9,11 @@ fork from https://github.com/apache/cordova-plugin-inappbrowser
 4、返回优化 可以根据内容判断是否退出  
 
 
-### 发布
+### 安装
+
 ```
-npm publish --registry=https://registry.npmjs.org/
+cordova plugin add cordova-plugin-mz-inappbrowser
+
+
 ```
 

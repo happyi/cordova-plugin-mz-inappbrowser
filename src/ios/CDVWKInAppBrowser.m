@@ -832,9 +832,7 @@ BOOL isExiting = FALSE;
 
 //    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
 //    self.closeButton.enabled = YES;
-    if(_browserOptions.closebuttoncaption==nil){
-        _browserOptions.closebuttoncaption =@"X";
-    }
+    _browserOptions.closebuttoncaption =@"关闭";
     NSString* closeString =_browserOptions.closebuttoncaption; // create arrow from Unicode char
     self.closeButton = [[UIBarButtonItem alloc] initWithTitle:closeString style:UIBarButtonItemStylePlain target:self action:@selector(close)];
     self.closeButton.enabled = YES;
@@ -959,10 +957,9 @@ BOOL isExiting = FALSE;
     } else if (_browserOptions.lefttoright) {
         [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
     } else {
-        UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+       UIBarButtonItem *fixedSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
         fixedSpace.width = -30;
-
-        [self.toolbar setItems:@[self.backArrowButton,fixedSpace,self.backButton, flexibleSpaceButton,self.titleButton,flexibleSpaceButton]];
+        [self.toolbar setItems:@[self.backArrowButton,fixedSpace,self.backButton, flexibleSpaceButton,self.titleButton,flexibleSpaceButton,self.closeButton]];
     }
 
 
@@ -1169,7 +1166,7 @@ BOOL isExiting = FALSE;
 }
 
 - (BOOL)prefersStatusBarHidden {
-    return YES;
+    return NO;
 }
 
 - (void)close

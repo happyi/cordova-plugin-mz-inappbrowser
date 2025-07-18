@@ -358,11 +358,28 @@ static CDVWKInAppBrowser* instance = nil;
     [self.webViewEngine loadRequest:request];
 }
 
-- (void)openInSystem:(NSURL*)url
-{
-    if ([[UIApplication sharedApplication] openURL:url] == NO) {
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
-        [[UIApplication sharedApplication] openURL:url];
+
+- (void)openInSystem:(NSURL*)url {
+    if (!url) return;
+
+    if (@available(iOS 10.0, *)) {
+        [[UIApplication sharedApplication] openURL:url
+                                           options:@{}
+                                 completionHandler:^(BOOL success) {
+            if (!success) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:CDVPluginHandleOpenURLNotification
+                                                                  object:url];
+                // 二次尝试跳转（关闭Universal Links限制）
+                [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+            }
+        }];
+    } else {
+        // iOS 9及以下保留原始逻辑
+        if (![[UIApplication sharedApplication] openURL:url]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:CDVPluginHandleOpenURLNotification
+                                                              object:url];
+            [[UIApplication sharedApplication] openURL:url];
+        }
     }
 }
 

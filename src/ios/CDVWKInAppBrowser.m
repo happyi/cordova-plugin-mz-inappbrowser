@@ -1166,6 +1166,10 @@ BOOL isExiting = FALSE;
 }
 
 - (BOOL)prefersStatusBarHidden {
+    NSString* statusBarHiddenPreference = [self settingForKey:@"InAppBrowserStatusBarHidden"];
+    if (statusBarHiddenPreference && [statusBarHiddenPreference isEqualToString:@"true"]) {
+        return YES;
+    }
     return NO;
 }
 
